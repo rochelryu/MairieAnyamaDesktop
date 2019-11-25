@@ -1,7 +1,5 @@
 import React from 'react';
 import { Link } from "react-router-dom";
-import { login } from "../providers/index";
-import NotificationAlert from "react-notification-alert";
 import { Spin } from 'antd';
 import 'antd/dist/antd.css';
 

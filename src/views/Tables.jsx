@@ -1,7 +1,7 @@
 
 import React from "react";
 
-import { Form, Input, Button, Spin, Table, Modal} from "antd";
+import { Button, Spin, Table, Modal} from "antd";
 import { naissance, viewExtrait } from "../providers/index";
 import ReactToPrint from "react-to-print";
 

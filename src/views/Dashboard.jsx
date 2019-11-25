@@ -16,7 +16,6 @@ import {
 import { DatePicker, Select , Button, Spin, Table} from 'antd';
 import 'antd/dist/antd.css';
 import 'assets/css/table.css';
-import { from } from "rxjs";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -30,7 +29,6 @@ class Dashboard extends React.Component {
       loading:true,
       info:{},
       userManage:[],
-      filteredInfo: null,
     sortedInfo: null,
     }
     this.dashboardNASDAQChart = {
@@ -313,33 +311,22 @@ class Dashboard extends React.Component {
     console.log(`selected ${value}`);
   }
   
-  onBlur() {
-    console.log('blur');
-  }
-  
-  onFocus() {
-    console.log('focus');
-  }
+
   
   onSearch(val) {
     console.log('search:', val);
   }
 
-  handleChange = (pagination, filters, sorter) => {
-    console.log('Various parameters', pagination, filters, sorter);
+  handleChange = (pagination, sorter) => {
+    console.log('Various parameters', pagination, sorter);
     this.setState({
-      filteredInfo: filters,
       sortedInfo: sorter,
     });
   };
 
-  clearFilters = () => {
-    this.setState({ filteredInfo: null });
-  };
 
   clearAll = () => {
     this.setState({
-      filteredInfo: null,
       sortedInfo: null,
     });
   };
@@ -348,9 +335,8 @@ class Dashboard extends React.Component {
   render() {
     if(!this.state.loading){
 
-      let { sortedInfo, filteredInfo } = this.state;
+      let { sortedInfo } = this.state;
     sortedInfo = sortedInfo || {};
-    filteredInfo = filteredInfo || {};
     const columns = [
       {
         title: 'Nom',
@@ -535,15 +521,15 @@ class Dashboard extends React.Component {
                     <p className="card-category">Filtrer par Genre, par date et par type de certificat</p>
                     <div>
                       
-                      <RangePicker placeholder="Interval de Date" onChange={this.onChange} placeholder={['Début Date', 'Fin Date']}/><br/>
+                      <RangePicker placeholder="Interval de Date" onChange={this.onChange} placeholder={['Début Date', 'Fin Date']}/>
+
+                      <br/>
                       <Select
       showSearch
       style={{ width: 200 }}
-      placeholder="Select a person"
+      placeholder="Selection de type"
       optionFilterProp="children"
       onChange={this.onChangeSelect}
-      onFocus={this.onFocus}
-      onBlur={this.onBlur}
       onSearch={this.onSearch}
       filterOption={(input, option) =>
         option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -578,8 +564,6 @@ class Dashboard extends React.Component {
                       placeholder="Selectionné une date"
                       optionFilterProp="children"
                       onChange={this.onChangeSelect}
-                      onFocus={this.onFocus}
-                      onBlur={this.onBlur}
                       onSearch={this.onSearch}
                       filterOption={(input, option) =>
                         option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -619,7 +603,7 @@ class Dashboard extends React.Component {
                     <CardTitle tag="h5">Satistique enregistrement</CardTitle>                    
                   </CardHeader>
                   <CardBody>
-                  <Table columns={columns} dataSource={this.state.userManage} onChange={this.handleChange} />
+                  <Table columns={columns} dataSource={this.state.userManage} onChange={this.handleChange} rowKey={record => record.id} />
                   </CardBody>
                   
                 </Card>
