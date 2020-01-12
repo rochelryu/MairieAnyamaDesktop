@@ -20,7 +20,7 @@ let User = class {
                         if(ele){
                             db.query("UPDATE user SET login_date = NOW() WHERE user.id = ?", [parseInt(result[0].id, 10)])
                             .then((results)=>{
-                                db.query("SELECT * FROM user WHERE id = ?", [parseInt(result[0].id, 10)])
+                                db.query("SELECT role.name nom, user.cryptEmail, user.name, user.firstname, user.id FROM user LEFT JOIN role ON user.role_id = role.id WHERE user.id = ?", [parseInt(result[0].id, 10)])
                                 .then((resultss)=> {
                                         var theToken = jwt.sign({ user : resultss[0].cryptEmail, nom : resultss[0].name, prenom:resultss[0].firstname, id:resultss[0].id}, config.code, {expiresIn: 64 * 60 * 60});
                                         next({'token' : theToken, user:resultss[0]});
@@ -41,6 +41,36 @@ let User = class {
                     next(err);
             })
         });
+    }
+
+    static setUser(pseudo,name,firstname,contact,email,password,address, agreement, token){
+        return new Promise(next=>{
+            jwt.verify(token, config.code, (err, user)=>{
+                if(err) { next(err) }
+                else {
+                    db.query("SELECT id FROM user WHERE pseudo = ?", [pseudo])
+                    .then(async res =>{
+                        if(res[0]){
+                            next({etat: false, error:"Ce pseudo existe déjà !"})
+                        } else{
+                            const pass = await hash(password);
+                            const role = agreement ? 3:1; 
+                            const cryptEmail = await hash(pseudo); 
+                            console.log(pseudo,name,firstname,contact,email,pass,address,role,cryptEmail);
+                           db.query("INSERT INTO user (pseudo,name,firstname,contact,email,password,address, role_id, cryptEmail) VALUES (?,?,?,?,?,?,?,?,?)", [pseudo,name,firstname,contact,email,pass,address,role,cryptEmail])
+                           .then(ress =>{
+                                db.query("SELECT user.id,CONCAT(user.name,' ', user.firstname) nom ,user.contact, CONCAT(DAY(user.login_date),'/', MONTH(user.login_date),'/', YEAR(user.login_date), ' ',HOUR(user.login_date),'h:', MINUTE(user.login_date)) login, role.name FROM user LEFT JOIN role ON user.role_id = role.id ORDER BY name ASC")
+                                .then(resss=>{
+                                    next({etat:true, resultat:resss});
+                                })
+                                .catch(error=>next({etat: false, error}));
+                           })
+                        }
+
+                    }).catch(error => next({etat: false, error}))
+                }
+            })
+        })
     }
 
     static setEtablissement(name,token){
@@ -68,7 +98,6 @@ let User = class {
         return new Promise(next=>{
             jwt.verify(token, config.code, (err, user)=>{
                 if(err) {
-                    console.log(err)
                     next(err)
                 }
                 else{
@@ -77,7 +106,6 @@ let User = class {
                         next(res);
                     })
                     .catch(err=>{
-                        console.log(err);
                         next(err);
                     });
                 }
@@ -89,7 +117,6 @@ let User = class {
         return new Promise(next=>{
             jwt.verify(token, config.code, (err, user)=>{
                 if(err) {
-                    console.log(err)
                     next(err)
                 }
                 else{
@@ -98,7 +125,6 @@ let User = class {
                         next(res);
                     })
                     .catch(err=>{
-                        console.log(err);
                         next(err);
                     });
                 }
@@ -110,7 +136,6 @@ let User = class {
         return new Promise(next=>{
             jwt.verify(token, config.code, (err, user)=>{
                 if(err) {
-                    console.log(err)
                     next(err)
                 }
                 else{
@@ -119,7 +144,42 @@ let User = class {
                         next(res[0]);
                     })
                     .catch(err=>{
-                        console.log(err);
+                        next(err);
+                    });
+                }
+                })
+        });
+    }
+    static getMariageByName(token,name){
+        return new Promise(next=>{
+            jwt.verify(token, config.code, (err, user)=>{
+                if(err) {
+                    next(err)
+                }
+                else{
+                    db.query("SELECT * FROM ActeMariage WHERE nameFirst = ? OR nameSecond = ?", [name,name])
+                    .then(res=>{
+                        next(res[0]);
+                    })
+                    .catch(err=>{
+                        next(err);
+                    });
+                }
+                })
+        });
+    }
+    static getDecesByName(token,name){
+        return new Promise(next=>{
+            jwt.verify(token, config.code, (err, user)=>{
+                if(err) {
+                    next(err)
+                }
+                else{
+                    db.query("SELECT * FROM ActeDeces WHERE nom = ?", [name])
+                    .then(res=>{
+                        next(res[0]);
+                    })
+                    .catch(err=>{
                         next(err);
                     });
                 }
@@ -130,7 +190,6 @@ let User = class {
         return new Promise(next=>{
             jwt.verify(token, config.code, (err, user)=>{
                 if(err) {
-                    console.log(err)
                     next(err)
                 }
                 else{
@@ -139,7 +198,6 @@ let User = class {
                         next(res[0].num);
                     })
                     .catch(err=>{
-                        console.log(err);
                         next(err);
                     });
                 }
@@ -150,7 +208,6 @@ let User = class {
         return new Promise(next=>{
             jwt.verify(token, config.code, (err, user)=>{
                 if(err) {
-                    console.log(err)
                     next(err)
                 }
                 else{
@@ -159,7 +216,6 @@ let User = class {
                         next(res[0].num);
                     })
                     .catch(err=>{
-                        console.log(err);
                         next(err);
                     });
                 }
@@ -171,7 +227,7 @@ let User = class {
         return new Promise(next=>{
             jwt.verify(token, config.code, (err, user)=>{
                 if(err) next(err);
-                    db.query("SELECT id,CONCAT(name,' ', firstname) nom ,contact, CONCAT(DAY(login_date),'/', MONTH(login_date),'/', YEAR(login_date), ' ',HOUR(login_date),'h:', MINUTE(login_date)) login FROM user ORDER BY name ASC")
+                    db.query("SELECT user.id,CONCAT(user.name,' ', user.firstname) nom ,user.contact, CONCAT(DAY(user.login_date),'/', MONTH(user.login_date),'/', YEAR(user.login_date), ' ',HOUR(user.login_date),'h:', MINUTE(user.login_date)) login, role.name FROM user LEFT JOIN role ON user.role_id = role.id ORDER BY name ASC")
                     .then(res=>{
                         next(res);
                     })
@@ -181,11 +237,32 @@ let User = class {
     }
 
     static getNumberServiceByUser(token,userId){
-        let block = [new Array()];
         return new Promise(next=>{
             jwt.verify(token, config.code, (err, user)=>{
                 if(err) next(err);
                 db.query("SELECT COUNT(id) nombreService FROM ActeNaissance WHERE user_id = ?", [parseInt(userId,10)])
+                .then(ress=>{
+                    next(ress[0].nombreService)
+                }).catch(err=>next(err));
+                })
+        })
+    }
+    static getNumberServiceByClinique(token){
+        return new Promise(next=>{
+            jwt.verify(token, config.code, (err, user)=>{
+                if(err) next(err);
+                db.query("SELECT COUNT(ActeNaissance.id) nombreService, Etablissement.name nom, Etablissement.id FROM ActeNaissance LEFT JOIN Etablissement ON ActeNaissance.etablissement_id = Etablissement.id GROUP BY etablissement_id ORDER BY name ASC")
+                .then(ress=>{
+                    next(ress)
+                }).catch(err=>next(err));
+                })
+        })
+    }
+    static getNumberSexeByClinique(token, cliniqueId, sexe){
+        return new Promise(next=>{
+            jwt.verify(token, config.code, (err, user)=>{
+                if(err) next(err);
+                db.query("SELECT COUNT(ActeNaissance.id) nombreService FROM ActeNaissance WHERE ActeNaissance.etablissement_id = ? AND ActeNaissance.sexe = ?", [cliniqueId, sexe])
                 .then(ress=>{
                     next(ress[0].nombreService)
                 }).catch(err=>next(err));

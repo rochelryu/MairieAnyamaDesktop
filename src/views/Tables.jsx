@@ -19,7 +19,9 @@ class ExtraitImprime extends React.Component{
   constructor(props){
     super(props);
     this.state = {
-      info:{}
+      info:{},
+      mariage:{},
+      decess:{},
     }
   }
 
@@ -29,6 +31,8 @@ class ExtraitImprime extends React.Component{
     const block = await viewExtrait(localStorage.getItem("tokenCore"),id);
     this.setState({
       info:block.info,
+      mariage:block.mariage,
+      decess:block.decess,
     });
   }
 
@@ -38,6 +42,8 @@ class ExtraitImprime extends React.Component{
     const block = await viewExtrait(localStorage.getItem("tokenCore"),id);
     this.setState({
       info:block.info,
+      mariage:block.mariage,
+      decess:block.decess,
     });
   }
   
@@ -83,7 +89,7 @@ class ExtraitImprime extends React.Component{
             </div>
             <div className="flex8">
               <div className="flexxx">
-                  <p>{this.state.info.dateInLetter} <br/> est {(this.state.info.sexe ==="masculin")? "né":"née"} {this.state.info.nameEnfant} - {this.state.info.firstnameEnfant} <br/> à {this.state.info.circonscrit} <br/> <span>Fils de</span> {this.state.info.namePapa}<br/><hr size="5" width="180"/><br/> <span>et de</span>{this.state.info.nameMaman}</p>
+                  <p>{this.state.info.dateInLetter} <br/> est {(this.state.info.sexe ==="masculin")? "né":"née"} {this.state.info.nameEnfant} - {this.state.info.firstnameEnfant} <br/> à {this.state.info.circonscrit} <br/> <span>Fils de</span> {this.state.info.namePapa}<br/><hr size="5" width="180"/><br/> <span>et de </span>{this.state.info.nameMaman}</p>
               </div>
               
             </div>
@@ -91,9 +97,15 @@ class ExtraitImprime extends React.Component{
           <hr className="dernier" size="10"/>
           <div className="Mention">
             <h2>MENTIONS (Eventuellement)</h2>
-            <p>**********Néant**********</p>
+            
           </div>
-          <p>Certifié le présent extrait conforme aux indications portées au registre</p>
+    <p className="paragrapheMention">Marié(e) le {(this.state.mariage.dateMariage === "N/A") ? "......................................................................................................................................................": `${new Date(this.state.mariage.dateMariage).toLocaleDateString()} ${this.state.mariage.verbe} ................................................................................................` } <br/>
+   Avec { (this.state.mariage !== {} && this.state.mariage.dateMariage !== "N/A") ? (this.state.info.sexe === "masculin") ? `Mlle ${this.state.mariage.nameSecond} .....................................................................................................`: `M. ${this.state.mariage.nameSecond} ....................................................................................................................................................................................` : "..........................................................................................................................................................." } <br/>
+   Divorce le ....................................................................................................................................................... <br/>
+    </p>
+    <p className="paragrapheMention">Décédé(e) le ....................................................................................... à ........................................................ <br/>
+   
+    </p>
 
           <div className="bott">
             <div className="timbre">
@@ -137,31 +149,35 @@ class Tables extends React.Component {
     //window.open(`${uriFront}print/${e}`, '_bank');
   }
 
-  handleChange(value){
-    console.log(value)
-  }
-
   async componentDidMount(){
     const token =  await localStorage.getItem("tokenCore");
     const block = await naissance(token);
-    const blocks = block.map((value)=>{
-      return {
-      id: value.id,
-      nameEnfant: value.nameEnfant,
-      firstnameEnfant: value.firstnameEnfant,
-      sexe: value.sexe,
-      namePapa: value.namePapa,
-      nameMaman: value.nameMaman,
-      register_date: value.register_date.replace(/T/gi, '').substring(0,10),
-      action: <Button type="primary" icon="printer" onClick={()=>this.prints(value.id)}>Imprimer</Button>
-      }
-
-    })
-    this.setState({
-      info:block,
-      isLoading:false,
-      userManage:blocks
-    });
+    if(block.code === "PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR"){
+      localStorage.removeItem('level'); 
+      localStorage.removeItem('tokenCore'); 
+      this.props.history.push('/admin/login')
+    }
+    else {
+      const blocks = block.map((value)=>{
+        return {
+        id: value.id,
+        nameEnfant: value.nameEnfant,
+        firstnameEnfant: value.firstnameEnfant,
+        sexe: value.sexe,
+        namePapa: value.namePapa,
+        nameMaman: value.nameMaman,
+        register_date: value.register_date.replace(/T/gi, '').substring(0,10),
+        action: <Button type="primary" icon="printer" onClick={()=>this.prints(value.id)}>Imprimer</Button>
+        }
+  
+      })
+      this.setState({
+        info:block,
+        isLoading:false,
+        userManage:blocks
+      });
+    }
+    
   }
   render() {
     if(!this.state.isLoading){

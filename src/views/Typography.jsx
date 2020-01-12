@@ -86,20 +86,28 @@ class Typography extends React.Component {
   async componentDidMount(){
     const token =  await localStorage.getItem("tokenCore");
     const block = await etablissement(token);
-    const blocks = block.map((value)=>{
-      return {
-      id: value.id,
-      name: value.name,
-      register_date: value.register_date.replace(/T/gi, ' à ').substring(0,18),
-      action: <Button type="primary" icon="print" onClick={()=>this.prints(value.id)}>Supprimer</Button>
-      }
-
-    })
-    this.setState({
-      info:block,
-      isLoading:false,
-      userManage:blocks
-    });
+    if(block.code === "PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR"){
+      localStorage.removeItem('level'); 
+      localStorage.removeItem('tokenCore'); 
+      this.props.history.push('/admin/login')
+    }
+    else {
+      const blocks = block.map((value)=>{
+        return {
+        id: value.id,
+        name: value.name,
+        register_date: value.register_date.replace(/T/gi, ' à ').substring(0,18),
+        action: <Button type="primary" icon="print" onClick={()=>this.prints(value.id)}>Supprimer</Button>
+        }
+  
+      })
+      this.setState({
+        info:block,
+        isLoading:false,
+        userManage:blocks
+      });
+    }
+    
   }
 
   async handleSubmit(){

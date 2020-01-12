@@ -49,7 +49,7 @@ class Profil extends React.Component {
                     </a>
                   </div>
                   <p className="description text-center">
-                  @Enregistreur
+                  @Super Administrateur
                   </p>
                 </CardBody>
                 </Card>
@@ -66,7 +66,7 @@ class Profil extends React.Component {
                         <FormGroup>
                           <label>Role</label>
                           <Input
-                            defaultValue="Enregistreur"
+                            defaultValue="Super Administrateur"
                             disabled
                             placeholder="Company"
                             type="text"
@@ -77,7 +77,7 @@ class Profil extends React.Component {
                         <FormGroup>
                           <label>Nom</label>
                           <Input
-                            defaultValue={this.nom}
+                            defaultValue={this.name}
                             placeholder="Nom"
                             type="text"
                           />
@@ -123,34 +123,6 @@ class Profil extends React.Component {
                             placeholder="Home Address"
                             type="text"
                           />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col className="pr-1" md="4">
-                        <FormGroup>
-                          <label>City</label>
-                          <Input
-                            defaultValue="Melbourne"
-                            placeholder="City"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col className="px-1" md="4">
-                        <FormGroup>
-                          <label>Country</label>
-                          <Input
-                            defaultValue="Australia"
-                            placeholder="Country"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col className="pl-1" md="4">
-                        <FormGroup>
-                          <label>Postal Code</label>
-                          <Input placeholder="ZIP Code" type="number" />
                         </FormGroup>
                       </Col>
                     </Row>

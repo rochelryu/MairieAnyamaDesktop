@@ -13,6 +13,7 @@ class Sidebar extends React.Component {
   constructor(props) {
     super(props);
     this.activeRoute.bind(this);
+    this.role = localStorage.getItem("level") || 'Agent'
     this.sidebar = React.createRef();
   }
   // verifies if routeName is the one active (in browser input)
@@ -57,26 +58,51 @@ class Sidebar extends React.Component {
         </div>
         <div className="sidebar-wrapper" ref={this.sidebar}>
           <Nav>
-            {this.props.routes.map((prop, key) => {
-              return (
-                <li
-                  className={
-                    this.activeRoute(prop.path) +
-                    (prop.pro ? " active-pro" : "")
-                  }
-                  key={key}
-                >
-                  <NavLink
-                    to={prop.layout + prop.path}
-                    className="nav-link"
-                    activeClassName="active"
-                  >
-                    <i className={prop.icon} />
-                    <p>{prop.name}</p>
-                  </NavLink>
-                </li>
-              );
-            })}
+            { this.props.routes.map((prop, key) => {
+              if (this.role !== "Agent") {
+                  return (
+                    <li
+                      className={
+                        this.activeRoute(prop.path) +
+                        (prop.pro ? " active-pro" : "")
+                      }
+                      key={key}
+                    >
+                      <NavLink
+                        to={prop.layout + prop.path}
+                        className="nav-link"
+                        activeClassName="active"
+                      >
+                        <i className={prop.icon} />
+                        <p>{prop.name}</p>
+                      </NavLink>
+                    </li>
+                  );
+              } else {
+                  if (prop.path !== "/dashboard" && prop.path !== "/typography" && prop.path !== "/create") {
+                    return (
+                      <li
+                        className={
+                          this.activeRoute(prop.path) +
+                          (prop.pro ? " active-pro" : "")
+                        }
+                        key={key}
+                      >
+                        <NavLink
+                          to={prop.layout + prop.path}
+                          className="nav-link"
+                          activeClassName="active"
+                        >
+                          <i className={prop.icon} />
+                          <p>{prop.name}</p>
+                        </NavLink>
+                      </li>
+                    );
+                  } else return null
+                  
+                }
+              }
+            )}
           </Nav>
         </div>
       </div>

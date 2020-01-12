@@ -72,11 +72,10 @@ class Print extends React.Component {
     };
     this.notificationAlert.current.notificationAlert(options);
   }
-  async componentWillMount(){
-    let {handle} = this.props.match.params;
-    const handles = handle + '/' + this.props.location.search;
-    console.log(handles)
-  }
+  // async componentWillMount(){
+  //   let {handle} = this.props.match.params;
+  //   const handles = handle + '/' + this.props.location.search;
+  // }
 
     edit(e){
         this.setState(

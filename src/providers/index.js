@@ -1,5 +1,5 @@
 import axios from 'axios';
-const uriLocal = "http://93.104.213.181:8090/ryu/";
+const uriLocal = "http://127.0.0.1:8090/ryu/";
 export const uriFront = "http://93.104.213.181:3000/ryu/";
 
 
@@ -51,6 +51,21 @@ export const setEtablissement = (name,tokent) => {
     };
     return new Promise(async next=>{
         await axios.post(`${uriLocal}etabliss`, ele )
+            .then((res) => {
+                next(res.data)
+            }).catch((err)=>{
+                console.log("err \n" +err)
+                next(err)
+            })
+    });
+}
+export const setUser = (block,token) => {
+    const ele = {
+        ...block,
+        token
+    };
+    return new Promise(async next=>{
+        await axios.post(`${uriLocal}createAdmin`, ele )
             .then((res) => {
                 next(res.data)
             }).catch((err)=>{

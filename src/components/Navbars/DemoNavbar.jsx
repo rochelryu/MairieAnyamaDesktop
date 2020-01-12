@@ -160,7 +160,7 @@ class Header extends React.Component {
                 <DropdownMenu right>
                   <DropdownItem tag="b"><Link to="/admins/profil">Profil</Link></DropdownItem>
                   <DropdownItem tag="b"><Link to="/admins/profil">Paramètres</Link></DropdownItem>
-                  <DropdownItem tag="b"><Link to="/admins/profil">Deconnexion</Link></DropdownItem>
+                  <DropdownItem tag="b"><span className="deconnexion" onClick={(e)=> {e.stopPropagation(); localStorage.removeItem('level'); localStorage.removeItem('tokenCore'); this.props.history.push('/admin/login')}}>Deconnexion</span></DropdownItem>
                 </DropdownMenu>
               </Dropdown>
               {/* <NavItem>

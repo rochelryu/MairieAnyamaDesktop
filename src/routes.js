@@ -3,8 +3,8 @@ import Dashboard from "views/Dashboard.jsx";
 import Icons from "views/Icons.jsx";
 import Typography from "views/Typography.jsx";
 import TableList from "views/Tables.jsx";
+import Create from "views/Create.jsx";
 //import UpgradeToPro from "views/Upgrade.jsx";
-
 var routes = [
   {
     path: "/dashboard",
@@ -53,6 +53,13 @@ var routes = [
     name: "Etablissement Santé",
     icon: "nc-icon nc-caps-small",
     component: Typography,
+    layout: "/admin"
+  },
+  {
+    path: "/create",
+    name: "Gestion des Comptes",
+    icon: "nc-icon nc-single-02",
+    component: Create,
     layout: "/admin"
   }
 ];

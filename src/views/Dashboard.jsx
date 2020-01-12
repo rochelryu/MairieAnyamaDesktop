@@ -1,5 +1,6 @@
 
 import React from "react";
+import DownloadButton from "../components/DownloadButton";
 import {  Pie, Bar } from "react-chartjs-2";
 import { all } from "../providers/index";
 import {
@@ -12,6 +13,7 @@ import {
   Col
 } from "reactstrap";
 
+
 //ant component
 import { DatePicker, Select , Button, Spin, Table} from 'antd';
 import 'antd/dist/antd.css';
@@ -19,6 +21,7 @@ import 'assets/css/table.css';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
+const dateFormat = 'DD/MM/YYYY';
 
 
 
@@ -29,8 +32,32 @@ class Dashboard extends React.Component {
       loading:true,
       info:{},
       userManage:[],
-    sortedInfo: null,
+      cliniqueManage: [],
+      yearsManage: [],
+      sortedInfo: null,
     }
+    this.headersClinique = [
+      { label: "Numero", key: "id" },
+      { label: "Etablissement", key: "nom" },
+      { label: "Naissance Total", key: "nombreService" },
+      { label: "Naissance sexe masculin", key: "nombreHomme" },
+      { label: "Naissance sexe feminin", key: "nombreFemme" },
+    ];
+    this.headersUsers = [
+      { label: "Numero", key: "id" },
+      { label: "Nom de l'agent", key: "nom" },
+      { label: "Contact", key: "contact" },
+      { label: "Fonction", key: "name" },
+      { label: "Nombre de Enregistrement de Naissance", key: "nombreService" }
+    ];
+    this.headersAnnuel = [
+      { label: "Année", key: "years" },
+      { label: "Naissance", key: "naissance" },
+      { label: "Mariage", key: "mariage" },
+      { label: "Deces", key: "deces" },
+      { label: "Divorce", key: "divorce" },
+    ];
+    
     this.dashboardNASDAQChart = {
       data: canvas => {
         return {
@@ -189,11 +216,11 @@ class Dashboard extends React.Component {
       data: canvas => {
         return {
           labels: [
-            "2015",
-            "2016",
-            "2017",
-            "2018",
-            "2019",
+            new Date().getFullYear() - 4,
+            new Date().getFullYear() - 3,
+            new Date().getFullYear() - 2,
+            new Date().getFullYear() - 1,
+            new Date().getFullYear(),
             
           ],
           datasets: [
@@ -278,6 +305,12 @@ class Dashboard extends React.Component {
     }
   }
 
+  async componentWillMount() {
+   const role = await localStorage.getItem("level") || 'Agent'
+    if(role === 'Agent') {
+      this.props.history.push('/admin/icons');
+    }
+  }
   prints(e){
     console.log(e);
   }
@@ -285,22 +318,49 @@ class Dashboard extends React.Component {
   async componentDidMount(){
     const tok = await localStorage.getItem('tokenCore');
     const djake = await all(tok);
-    const blocks = djake.userManager.map((value)=>{
-      return {
-        id: value.id,
-      nom: value.nom,
-      contact: value.contact,
-      nombreService: value.nombreService,
-      login: value.login,
-      action: <Button type="primary" icon="print" onClick={()=>this.prints(value.id)}>Voir</Button>
-      }
-
-    })
-    this.setState({
-      info: djake,
-      userManage:blocks,
-      loading: !this.state.loading
-    })
+    if(djake.code === "PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR"){
+      localStorage.removeItem('level'); 
+      localStorage.removeItem('tokenCore'); 
+      this.props.history.push('/admin/login')
+    }
+    else {
+      const blocks = djake.userManager.map((value)=>{
+        return {
+          id: value.id,
+        nom: value.nom,
+        contact: value.contact,
+        nombreService: value.nombreService,
+        login: value.login,
+        action: <Button type="primary" icon="print" onClick={()=>this.prints(value.id)}>Voir</Button>
+        }
+  
+      })
+      const block = djake.cliniqueManage.map((value)=>{
+        return {
+          id: value.id,
+        nom: value.nom,
+        nombreService: value.nombreService,
+        action: <Button type="primary" icon="print" onClick={()=>this.prints(value.id)}>Voir</Button>
+        }
+  
+      })
+      const years = djake.naissanceAnnuel.map((value,index) => {
+        return {
+          years: new Date().getFullYear() - index,
+          naissance: value,
+          mariage: djake.mariageAnnuel[index],
+          deces: djake.decesAnnuel[index],
+          divorce: djake.divorceAnnuel[index],
+        }
+      })
+      this.setState({
+        info: djake,
+        userManage:blocks,
+        cliniqueManage: block,
+        yearsManage: years,
+        loading: !this.state.loading
+      })
+    }
   }
 
   onChange(date, dateString) {
@@ -368,6 +428,30 @@ class Dashboard extends React.Component {
         key: 'login',
         sorter: (a, b) => a.login.length - b.login.length,
         sortOrder: sortedInfo.columnKey === 'login' && sortedInfo.order,
+        ellipsis: true,
+      },
+      {
+        title: 'Action',
+        dataIndex: 'action',
+        key: 'action',
+        ellipsis: true,
+      },
+    ];
+    const column = [
+      {
+        title: 'Nom',
+        dataIndex: 'nom',
+        key: 'nom',
+        sorter: (a, b) => a.nom.length - b.nom.length,
+        sortOrder: sortedInfo.columnKey === 'nom' && sortedInfo.order,
+        ellipsis: true,
+      },
+      {
+        title: 'Nombre se Service Effectué',
+        dataIndex: 'nombreService',
+        key: 'nombreService',
+        sorter: (a, b) => a.nombreService.length - b.nombreService.length,
+        sortOrder: sortedInfo.columnKey === 'nombreService' && sortedInfo.order,
         ellipsis: true,
       },
       {
@@ -490,6 +574,7 @@ class Dashboard extends React.Component {
             <Row>
               <Col md="12">
                 <Card>
+                <DownloadButton data={this.state.yearsManage} headers={this.headersAnnuel}  />
                   <CardHeader>
                     <CardTitle tag="h5">Statistiques Annuels</CardTitle>
                   </CardHeader>
@@ -516,12 +601,13 @@ class Dashboard extends React.Component {
             <Row>
               <Col md="4">
                 <Card>
+                <DownloadButton data={this.state.cliniqueManage} headers={this.headersClinique}  />
                   <CardHeader>
                     <CardTitle tag="h5">Statique par Genre</CardTitle>
                     <p className="card-category">Filtrer par Genre, par date et par type de certificat</p>
                     <div>
                       
-                      <RangePicker placeholder="Interval de Date" onChange={this.onChange} placeholder={['Début Date', 'Fin Date']}/>
+                      <RangePicker format={dateFormat} onChange={this.onChange} placeholder={['Début Date', 'Fin Date']}/>
 
                       <br/>
                       <Select
@@ -535,7 +621,7 @@ class Dashboard extends React.Component {
         option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
       }
     >
-      <Option value="jack">Certificat de Naissance</Option>
+      <Option value="jack">Acte de Naissance</Option>
       <Option value="lucy">Acte de Décès</Option>
       <Option value="tom">Acte de Mariage</Option>
       <Option value="tom">Acte de Divorce</Option>
@@ -555,6 +641,7 @@ class Dashboard extends React.Component {
               </Col>
               <Col md="8">
                 <Card className="card-chart">
+                <DownloadButton data={this.state.cliniqueManage} headers={this.headersClinique}  />
                   <CardHeader>
                     <CardTitle tag="h5">Satistique enregistrement</CardTitle>
                     <p className="card-category">filtrer par semaine</p><br/>
@@ -599,8 +686,9 @@ class Dashboard extends React.Component {
             <Row>
               <Col md="12">
               <Card className="card-chart">
+              <DownloadButton data={this.state.userManage} headers={this.headersUsers}  />
                   <CardHeader>
-                    <CardTitle tag="h5">Satistique enregistrement</CardTitle>                    
+                    <CardTitle tag="h5">Satistique enregistrement par Agent</CardTitle>                    
                   </CardHeader>
                   <CardBody>
                   <Table columns={columns} dataSource={this.state.userManage} onChange={this.handleChange} rowKey={record => record.id} />
@@ -610,6 +698,22 @@ class Dashboard extends React.Component {
               
               </Col>
             </Row>
+            <Row>
+              <Col md="12">
+              <Card className="card-chart">
+              <DownloadButton data={this.state.cliniqueManage} headers={this.headersClinique}  />
+                  <CardHeader>
+                    <CardTitle tag="h5">Satistique enregistrement Par clinique</CardTitle>                    
+                  </CardHeader>
+                  <CardBody>
+                  <Table columns={column} dataSource={this.state.cliniqueManage} onChange={this.handleChange} rowKey={record => record.id} />
+                  </CardBody>
+                  
+                </Card>
+              
+              </Col>
+            </Row>
+          
           </div>
         </>
       );

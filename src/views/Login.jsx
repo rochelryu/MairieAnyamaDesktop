@@ -98,7 +98,10 @@ class Login extends React.Component {
               this.setState({isLoading: false});
               setTimeout(()=>{
                 localStorage.setItem("tokenCore", logg.token)
-                this.props.history.push('/admin/dashboard');
+                localStorage.setItem("level", logg.user.nom)
+                if (logg.user.nom !== "Agent") {
+                  this.props.history.push('/admin/dashboard')
+                } else { this.props.history.push('/admin/icons') }
               },1500)
 
             }

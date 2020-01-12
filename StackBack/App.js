@@ -9,14 +9,13 @@ let bodyParser = require('body-parser');
 
 mysql.createConnection({
     host     : config.db.host,
+    port     : config.db.port,
     user     : config.db.user,
     password : config.db.password,
     database : config.db.database
   }).then(db=>{
-      console.log("connecté");
       const app = express();
       let Admin = express.Router();
-      let Share = express.Router();
       app.use(morgan('dev'));
       app.use(cors());
       app.use(bodyParser.json());
@@ -59,10 +58,17 @@ mysql.createConnection({
           info.desc = new Array(Math.round(Math.random()*77), Math.round(Math.random()*77),Math.round(Math.random()*77), Math.round(Math.random()*77), Math.round(Math.random()*77), Math.round(Math.random()*77), Math.round(Math.random()*77));
           info.div = new Array(Math.round(Math.random()*77), Math.round(Math.random()*77),Math.round(Math.random()*77), Math.round(Math.random()*77), Math.round(Math.random()*77), Math.round(Math.random()*77), Math.round(Math.random()*77));
           let userManager = await User.getAllUser(req.params.tt);
+          
           for (let i in userManager){
             userManager[i].nombreService = await User.getNumberServiceByUser(req.params.tt,userManager[i].id);
           }
+          let cliniqueManage = await User.getNumberServiceByClinique(req.params.tt)
+          for(let i in cliniqueManage){
+            cliniqueManage[i].nombreHomme = await User.getNumberSexeByClinique(req.params.tt,cliniqueManage[i].id, "masculin");
+            cliniqueManage[i].nombreFemme = await User.getNumberSexeByClinique(req.params.tt,cliniqueManage[i].id, "feminin");
+          }
           info.userManager = userManager;
+          info.cliniqueManage = cliniqueManage;
           let inter = [];
           for(let i = 0; i < 7; i++){
               inter = [...inter, begin + i];
@@ -74,6 +80,12 @@ mysql.createConnection({
 Admin.route('/login')
       .post( async (req,res)=>{
         const beta = await User.userExist(req.body.name,req.body.password);
+        res.json(beta);
+      });
+
+      Admin.route('/createAdmin')
+      .post( async (req,res)=>{
+        const beta = await User.setUser(req.body.pseudo,req.body.name,req.body.firstname,req.body.prefix+req.body.phone,req.body.email,req.body.password,req.body.address,req.body.agreement,req.body.token);
         res.json(beta);
       });
 
@@ -90,8 +102,12 @@ Admin.route('/login')
       Admin.route('/extrait')
       .post(async (req, res)=>{
         const naiss = await User.getNaissanceById(req.body.tt,req.body.ite);
-        res.json({info:naiss});
+        let mariage = await User.getMariageByName(req.body.tt,`${naiss.nameEnfant} ${naiss.firstnameEnfant}`);
+        let decess = await User.getDecesByName(req.body.tt,`${naiss.nameEnfant} ${naiss.firstnameEnfant}`);
+        mariage = mariage ? mariage : {nameFirst:"", nameSecond:"",verbe:"",status:4,dateMariage:"N/A", registerDate:""};
+        res.json({info:naiss, mariage , decess});
       });
+
       Admin.route('/etabliss')
       .post( async (req,res)=>{
 
