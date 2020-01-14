@@ -1,9 +1,10 @@
 
 import React from "react";
 
-import { Button, Spin, Table, Modal} from "antd";
+import { Button, Spin, Table, Modal, Icon, Input} from "antd";
 import { naissance, viewExtrait } from "../providers/index";
 import ReactToPrint from "react-to-print";
+import Highlighter from 'react-highlight-words';
 
 import {
   Card,
@@ -133,10 +134,94 @@ class Tables extends React.Component {
       info:[],
       name:"",
       userManage:[],
-    sortedInfo: null,
+      selectedRowKeys: [],
+      searchText: '',
+      searchedColumn: '',
+      loadingForMultiple: false,
     }
     
   }
+
+  start = () => {
+    this.setState({ loadingForMultiple: true });
+    // ajax request after empty completing
+    setTimeout(() => {
+      this.setState({
+        selectedRowKeys: [],
+        loadingForMultiple: false,
+      });
+    }, 1000);
+  };
+  getColumnSearchProps = dataIndex => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={node => {
+            this.searchInput = node;
+          }}
+          placeholder={`Recherche ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
+        />
+        <Button
+          type="primary"
+          onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+          icon="search"
+          size="small"
+          style={{ width: 90, marginRight: 8 }}
+        >
+        </Button>
+        <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+          Annuler
+        </Button>
+      </div>
+    ),
+    filterIcon: filtered => (
+      <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        .toString()
+        .toLowerCase()
+        .includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => this.searchInput.select());
+      }
+    },
+    render: text =>
+      this.state.searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[this.state.searchText]}
+          autoEscape
+          textToHighlight={text.toString()}
+        />
+      ) : (
+        text
+      ),
+  });
+
+  handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    this.setState({
+      searchText: selectedKeys[0],
+      searchedColumn: dataIndex,
+    });
+  };
+
+  handleReset = clearFilters => {
+    clearFilters();
+    this.setState({ searchText: '' });
+  };
+
+
+  onSelectChange = selectedRowKeys => {
+    console.log('selectedRowKeys changed: ', selectedRowKeys);
+    this.setState({ selectedRowKeys });
+  };
 
   setModal1Visible(modal1Visible) {
     this.setState({ modal1Visible });
@@ -180,62 +265,100 @@ class Tables extends React.Component {
     
   }
   render() {
+
     if(!this.state.isLoading){
-      let { sortedInfo } = this.state;
-      sortedInfo = sortedInfo || {};
+
+      let { loadingForMultiple, selectedRowKeys } = this.state;
+      const rowSelection = {
+        selectedRowKeys,
+        onChange: this.onSelectChange,
+        hideDefaultSelections: true,
+        selections: [
+          {
+            key: 'all-data',
+            text: 'Tout le tableau',
+            onSelect: () => {
+              this.setState({
+                selectedRowKeys: [...Array(this.state.userManage.length).keys()], // 0...45
+              });
+            },
+          },
+          {
+            key: 'odd',
+            text: "Pas encore imprimés",
+            onSelect: changableRowKeys => {
+              let newSelectedRowKeys = [];
+              newSelectedRowKeys = changableRowKeys.filter((key, index) => {
+                console.log(key, index)
+                if (index % 2 !== 0) {
+                  return false;
+                }
+                return true;
+              });
+              this.setState({ selectedRowKeys: newSelectedRowKeys });
+            },
+          },
+          {
+            key: 'even',
+            text: 'Déjà imprimés',
+            onSelect: changableRowKeys => {
+              let newSelectedRowKeys = [];
+              newSelectedRowKeys = changableRowKeys.filter((key, index) => {
+                if (index % 2 !== 0) {
+                  return true;
+                }
+                return false;
+              });
+              this.setState({ selectedRowKeys: newSelectedRowKeys });
+            },
+          },
+        ],
+      };
       const columns = [
         {
           title: 'Nº Extrait',
           dataIndex: 'id',
           key: 'id',
-          sorter: (a, b) => a.id.length - b.id.length,
-          sortOrder: sortedInfo.columnKey === 'id' && sortedInfo.order,
-          ellipsis: true,
+          width:'7%',
         },
         {
           title: 'Nom',
           dataIndex: 'nameEnfant',
           key: 'nameEnfant',
-          sorter: (a, b) => a.nameEnfant.length - b.nameEnfant.length,
-          sortOrder: sortedInfo.columnKey === 'nameEnfant' && sortedInfo.order,
-          ellipsis: true,
+          width:'8%',
+          ...this.getColumnSearchProps('nameEnfant'),
         },
         {
           title: 'Prénom',
           dataIndex: 'firstnameEnfant',
           key: 'firstnameEnfant',
-          sorter: (a, b) => a.firstnameEnfant.length - b.firstnameEnfant.length,
-          sortOrder: sortedInfo.columnKey === 'firstnameEnfant' && sortedInfo.order,
-          ellipsis: true,
+          width:'18%',
+          ...this.getColumnSearchProps('firstnameEnfant'),
         },{
           title: 'Sexe',
           dataIndex: 'sexe',
           key: 'sexe',
-          sorter: (a, b) => a.sexe.length - b.sexe.length,
-          sortOrder: sortedInfo.columnKey === 'sexe' && sortedInfo.order,
-          ellipsis: true,
+          width:'10%',
+          ...this.getColumnSearchProps('sexe'),
         },{
           title: 'Nom Père',
           dataIndex: 'namePapa',
           key: 'namePapa',
-          sorter: (a, b) => a.namePapa.length - b.namePapa.length,
-          sortOrder: sortedInfo.columnKey === 'namePapa' && sortedInfo.order,
-          ellipsis: true,
+          width:'11%',
+          ...this.getColumnSearchProps('namePapa'),
         },{
           title: 'Nom Mère',
           dataIndex: 'nameMaman',
           key: 'nameMaman',
-          sorter: (a, b) => a.nameMaman.length - b.nameMaman.length,
-          sortOrder: sortedInfo.columnKey === 'nameMaman' && sortedInfo.order,
-          ellipsis: true,
+          width:'11%',
+          ...this.getColumnSearchProps('nameMaman'),
         },
         {
           title: 'Date enregistrement',
           dataIndex: 'register_date',
           key: 'register_date',
-          sorter: (a, b) => a.register_date.length - b.register_date.length,
-          sortOrder: sortedInfo.columnKey === 'register_date' && sortedInfo.order,
-          ellipsis: true,
+          width:'14%',
+          ...this.getColumnSearchProps('register_date'),
         },
         
         {
@@ -245,6 +368,7 @@ class Tables extends React.Component {
           ellipsis: true,
         },
       ];
+      const hasSelected = selectedRowKeys.length > 0;
     return (
       <>
         <div className="content">
@@ -253,10 +377,18 @@ class Tables extends React.Component {
               <Card>
                 <CardHeader>
                   <CardTitle tag="h4">Liste des Actes</CardTitle>
+                  <div style={{ marginBottom: 16 }}>
+                    <Button type="primary" onClick={this.start} disabled={!hasSelected} loading={loadingForMultiple}>
+                      Imprimer
+                    </Button>
+                    <span style={{ marginLeft: 8 }}>
+                      {hasSelected ? `${selectedRowKeys.length} élements Selectionnés` : ''}
+                    </span>
+                  </div>
                 </CardHeader>
                 <CardBody>
                 
-                <Table columns={columns} dataSource={this.state.userManage} />
+                <Table rowSelection={rowSelection} columns={columns} dataSource={this.state.userManage} />
                 </CardBody>
               </Card>
             </Col>

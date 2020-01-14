@@ -4,6 +4,7 @@ import Icons from "views/Icons.jsx";
 import Typography from "views/Typography.jsx";
 import TableList from "views/Tables.jsx";
 import Create from "views/Create.jsx";
+import HomeAgent from "views/HomeAgent";
 //import UpgradeToPro from "views/Upgrade.jsx";
 var routes = [
   {
@@ -11,6 +12,13 @@ var routes = [
     name: "Tableau de Bord",
     icon: "nc-icon nc-bank",
     component: Dashboard,
+    layout: "/admin"
+  },
+  {
+    path: "/dash",
+    name: "Accueil",
+    icon: "nc-icon nc-bank",
+    component: HomeAgent,
     layout: "/admin"
   },
   {

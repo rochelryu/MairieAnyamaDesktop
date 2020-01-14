@@ -308,7 +308,7 @@ class Dashboard extends React.Component {
   async componentWillMount() {
    const role = await localStorage.getItem("level") || 'Agent'
     if(role === 'Agent') {
-      this.props.history.push('/admin/icons');
+      this.props.history.push('/admin/dash');
     }
   }
   prints(e){

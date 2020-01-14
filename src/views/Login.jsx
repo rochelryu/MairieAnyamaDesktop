@@ -101,7 +101,7 @@ class Login extends React.Component {
                 localStorage.setItem("level", logg.user.nom)
                 if (logg.user.nom !== "Agent") {
                   this.props.history.push('/admin/dashboard')
-                } else { this.props.history.push('/admin/icons') }
+                } else { this.props.history.push('/admin/dash') }
               },1500)
 
             }

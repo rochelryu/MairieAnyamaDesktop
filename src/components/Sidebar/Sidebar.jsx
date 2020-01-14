@@ -60,6 +60,7 @@ class Sidebar extends React.Component {
           <Nav>
             { this.props.routes.map((prop, key) => {
               if (this.role !== "Agent") {
+                if (prop.path !== "/dash") {
                   return (
                     <li
                       className={
@@ -78,6 +79,8 @@ class Sidebar extends React.Component {
                       </NavLink>
                     </li>
                   );
+                } else return null  
+                
               } else {
                   if (prop.path !== "/dashboard" && prop.path !== "/typography" && prop.path !== "/create") {
                     return (
