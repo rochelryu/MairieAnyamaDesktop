@@ -1,0 +1,11 @@
+{
+    "db":{
+        "host"     : "localhost",
+        "user"     : "root",
+        "password" : "root",
+        "database" : "mairie_ayama",
+        "port": 8889
+    },
+    "port": "8090",
+    "code":"je suis ce que je suis et aucun autre man"
+}

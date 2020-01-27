@@ -1,7 +1,7 @@
 {
   "name": "mairie-anyama",
   "version": "1.1.0",
-  "homepage": ".",
+  "homepage": "./",
   "private": true,
   "dependencies": {
     "antd": "^3.26.6",

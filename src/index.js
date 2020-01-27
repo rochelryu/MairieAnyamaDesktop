@@ -14,7 +14,9 @@ import AdminLayoutTwo from "layouts/Admins.jsx";
 import Login from "views/Login.jsx";
 import Print from "views/Print.jsx";
 
-const hist = createBrowserHistory();
+const hist = createBrowserHistory({
+  basename: process.env.PUBLIC_URL
+});
 
 const PrivateRoute = ({component:Component, ...rest}) =>(
   <Route {...rest} render={props => localStorage.getItem("tokenCore") ? (<Component {...props}/>) :

@@ -3,7 +3,6 @@
 # dependencies
 /node_modules
 /StackBack/node_modules
-/StackBack/config.json
 /StackBack/package-lock.json
 # testing
 /coverage
