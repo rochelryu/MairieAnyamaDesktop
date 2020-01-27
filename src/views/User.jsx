@@ -15,6 +15,7 @@ import {
   Row,
   Col
 } from "reactstrap";
+import "../assets/css/style.css";
 
 class User extends React.Component {
   render() {

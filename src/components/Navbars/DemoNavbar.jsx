@@ -13,6 +13,7 @@ import {
   DropdownItem,
   Container,
 } from "reactstrap";
+import "../../assets/css/style.css";
 
 import routes from "routes.js";
 

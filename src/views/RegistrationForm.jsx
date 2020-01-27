@@ -9,7 +9,8 @@ import {
     Checkbox,
     Button,
   } from 'antd';
-  
+  import "../assets/css/style.css";
+
   const { Option } = Select;
   
   

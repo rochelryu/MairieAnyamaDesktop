@@ -6,6 +6,7 @@ import { Nav } from "reactstrap";
 import PerfectScrollbar from "perfect-scrollbar";
 
 import logo from "logo.svg";
+import "../../assets/css/style.css";
 
 var ps;
 
@@ -53,7 +54,7 @@ class Sidebar extends React.Component {
             href="/"
             className="simple-text logo-normal"
           >
-            Mairie Anyama
+            Ma Mairie
           </a>
         </div>
         <div className="sidebar-wrapper" ref={this.sidebar}>

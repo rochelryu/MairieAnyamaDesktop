@@ -5,6 +5,7 @@ import { Card, CardHeader, CardBody, Row, Col } from "reactstrap";
 import { Form, Input, Button, Spin, Table } from "antd";
 import NotificationAlert from "react-notification-alert";
 import { etablissement,setEtablissement } from "../providers/index";
+import "../assets/css/style.css";
 
 
 

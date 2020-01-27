@@ -5,6 +5,7 @@ import React from "react";
 import Particles from 'react-particles-js';
 import logo from '../assets/img/bg.jpg';
 import jwt from 'jwt-decode';
+import "../assets/css/style.css";
 
 
 export default class HomeAgent extends React.Component {

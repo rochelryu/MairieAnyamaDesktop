@@ -14,6 +14,8 @@ import {
   Row,
   Col
 } from "reactstrap";
+import "../assets/css/style.css";
+let anterieur = 0;
 const Monthss = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Decembre']
 class ExtraitImprime extends React.Component{
 
@@ -40,12 +42,15 @@ class ExtraitImprime extends React.Component{
   async componentDidUpdate(){
     const id = this.props.id;
 
-    const block = await viewExtrait(localStorage.getItem("tokenCore"),id);
-    this.setState({
-      info:block.info,
-      mariage:block.mariage,
-      decess:block.decess,
-    });
+    if(parseInt(id, 10) !== anterieur){
+      const block = await viewExtrait(localStorage.getItem("tokenCore"),id);
+      this.setState({
+        info:block.info,
+        mariage:block.mariage,
+        decess:block.decess,
+      });
+      anterieur = parseInt(id, 10);
+    }
   }
   
 

@@ -26,6 +26,8 @@ import {
 } from "react-google-maps";
 // reactstrap components
 import { Card, CardHeader, CardBody, Row, Col } from "reactstrap";
+import "../assets/css/style.css";
+
 
 const MapWrapper = withScriptjs(
   withGoogleMap(props => (

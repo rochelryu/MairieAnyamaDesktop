@@ -9,6 +9,7 @@ import 'antd/dist/antd.css';
 
 import { bool } from "prop-types";
 import { etablissement, setNaissance } from "../providers/index";
+import "../assets/css/style.css";
 
 
 

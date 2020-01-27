@@ -12,6 +12,7 @@ import {
   Row,
   Col
 } from "reactstrap";
+import "../assets/css/style.css";
 
 class Notifications extends React.Component {
   state = {

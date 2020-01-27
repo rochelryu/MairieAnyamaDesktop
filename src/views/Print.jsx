@@ -92,7 +92,7 @@ class Print extends React.Component {
         return(
             <>
                 <div className="login">
-                    <h1>Mairie Anyama</h1>
+                    <h1>Ma Mairie</h1>
                     <div className="sub-main-w3">
                         <form action="#" method="post">
                             <div className="form-style-agile">

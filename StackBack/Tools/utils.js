@@ -3,8 +3,8 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
 function hash(password){
-    return new Promise(next=>{
-        bcrypt.hash(password, saltRounds)
+    return new Promise( async next=>{
+        await bcrypt.hash(password, saltRounds)
         .then(hash => {
             next(hash);
         })
@@ -14,8 +14,8 @@ function hash(password){
     });
 }
 function compare(newPass, hashPass){
-    return new Promise(next=>{
-        bcrypt.compare(newPass, hashPass).then(res => {
+    return new Promise(async next=>{
+        await bcrypt.compare(newPass, hashPass).then(res => {
             next(res);
         })
         .catch(err=>next(err));

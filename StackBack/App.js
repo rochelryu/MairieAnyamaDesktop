@@ -78,13 +78,14 @@ mysql.createConnection({
       });
 
 Admin.route('/login')
-      .post( async (req,res)=>{
+      .post( async (req,res) => {
         const beta = await User.userExist(req.body.name,req.body.password);
         res.json(beta);
       });
 
       Admin.route('/createAdmin')
       .post( async (req,res)=>{
+        console.log(req.body);
         const beta = await User.setUser(req.body.pseudo,req.body.name,req.body.firstname,req.body.prefix+req.body.phone,req.body.email,req.body.password,req.body.address,req.body.agreement,req.body.token);
         res.json(beta);
       });

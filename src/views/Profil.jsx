@@ -15,6 +15,7 @@ import {
   Col
 } from "reactstrap";
 import jwt from 'jwt-decode';
+import "../assets/css/style.css";
 
 
 class Profil extends React.Component {

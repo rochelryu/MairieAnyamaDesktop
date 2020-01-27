@@ -11,6 +11,7 @@ import {
   Row,
   Col
 } from "reactstrap";
+import "../assets/css/style.css";
 
 class Upgrade extends React.Component {
   render() {
